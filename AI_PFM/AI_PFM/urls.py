@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from tenants.views import CustomObtainAuthToken, UserRegistrationViewSet, LogoutView
+from tenants.views import CustomObtainAuthToken, UserRegistrationViewSet, LogoutView, UserDashboardViewSet
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -24,4 +24,5 @@ urlpatterns = [
     path('login/', CustomObtainAuthToken.as_view()),  # Login endpoint
     path('logout/', LogoutView.as_view()),  # Logout endpoint
     path('', include('rest_framework.urls')),
+    path('dashboard/', UserDashboardViewSet.as_view({'get': 'retrieve'})),
 ]

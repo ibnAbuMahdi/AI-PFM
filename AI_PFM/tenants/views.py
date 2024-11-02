@@ -1,4 +1,5 @@
 from rest_framework import viewsets, permissions
+from .serializers import UserDashboardSerializer
 from .serializers import UserRegistrationSerializer
 from .models import User
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -27,3 +28,11 @@ class LogoutView(APIView):
     def post(self, request):
         request.auth.delete()
         return Response({'message': 'Logged out successfully.'})
+
+
+class UserDashboardViewSet(viewsets.ModelViewSet):
+    serializer_class = UserDashboardSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        return User.objects.filter(id=self.request.user.id)
