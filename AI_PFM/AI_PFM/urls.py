@@ -22,10 +22,10 @@ from rest_framework.routers import DefaultRouter
 router = DefaultRouter()
 router.register(r'transactions', TransactionViewSet)
 router.register(r'budgets', BudgetViewSet)
+router.register(r'register', UserRegistrationViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('register/', UserRegistrationViewSet.as_view()),  # Registration endpoint
     path('login/', CustomObtainAuthToken.as_view()),  # Login endpoint
     path('logout/', LogoutView.as_view()),  # Logout endpoint
     path('', include('rest_framework.urls')),

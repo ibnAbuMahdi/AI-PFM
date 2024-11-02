@@ -16,14 +16,14 @@ class TenantBaseModel(models.Model):
         abstract = True
     
     
-class User(AbstractUser, TenantBaseModel):
+class User(TenantBaseModel, AbstractUser):
     # Other user-specific fields (e.g., email, first_name, last_name)
     email = models.EmailField()
-    username = models.CharField(max_length=255)
+    username = models.CharField(unique=True, max_length=255)
     password = models.CharField(max_length=255)
     
     
-class Transaction(models.Model, TenantBaseModel):
+class Transaction(TenantBaseModel, models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     category = models.CharField(max_length=50)
@@ -32,7 +32,7 @@ class Transaction(models.Model, TenantBaseModel):
     # Other transaction-specific fields (e.g., description, merchant)
     
 
-class Budget(models.Model, TenantBaseModel):
+class Budget(TenantBaseModel, models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.CharField(max_length=50)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
