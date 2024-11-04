@@ -54,6 +54,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'AI_PFM.urls'
+APPEND_SLASH = False
 
 TEMPLATES = [
     {

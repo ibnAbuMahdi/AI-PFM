@@ -13,6 +13,13 @@ class UserRegistrationViewSet(viewsets.ModelViewSet):
     serializer_class = UserRegistrationSerializer
     permission_classes = (permissions.AllowAny,)  # Allow anyone to register
 
+    def get_serializer_context(self):
+        # Add request to the context
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
+    
+
 class CustomObtainAuthToken(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)

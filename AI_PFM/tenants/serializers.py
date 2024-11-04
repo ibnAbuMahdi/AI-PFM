@@ -6,9 +6,11 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'password')
+        fields = ('username', 'email', 'password', 'tenant')
 
     def create(self, validated_data):
+        request = self.context.get('request')
+        validated_data['tenant'] = request.tenant
         user = User.objects.create_user(**validated_data)
         user.set_password(validated_data['password'])
         user.save()
