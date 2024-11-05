@@ -1,4 +1,4 @@
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, status
 from .serializers import UserDashboardSerializer
 from .serializers import UserRegistrationSerializer, TransactionSerializer, BudgetSerializer
 from .models import User, Transaction, Budget
@@ -7,6 +7,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import action
 
 class UserRegistrationViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -19,13 +20,27 @@ class UserRegistrationViewSet(viewsets.ModelViewSet):
         context['request'] = self.request
         return context
     
+    
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            token, _ = Token.objects.get_or_create(user=user)
+            return Response({
+                'token': token.key,
+                'user': {
+                    'username': user.username,
+                    'email': user.email
+                }
+            }, status=status.HTTP_200_OK)
+
 
 class CustomObtainAuthToken(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
         token = Token.objects.get(key=response.data['token'])
         user = token.user
-        response.data['tenant_id'] = user.tenant.id  # Include tenant ID
+        response.data['tenant_id'], response.data['username'], response.data['email'] = user.tenant.id, user.username, user.email  # Include tenant ID
         return response
 
 class LogoutView(APIView):
