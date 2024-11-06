@@ -19,7 +19,14 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
-        fields = '__all__'
+        exclude = ['user']
+
+    def create(self, validated_data):
+        # Access the user from the request context
+        user = self.context['request'].user
+        # Add the user to validated_data
+        validated_data['user'] = user
+        return super().create(validated_data)
 
 class BudgetSerializer(serializers.ModelSerializer):
     class Meta:

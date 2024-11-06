@@ -62,8 +62,14 @@ class TransactionViewSet(viewsets.ModelViewSet):
     serializer_class = TransactionSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request  # Pass the request to the serializer context
+        return context
+    
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+                    
 
 class BudgetViewSet(viewsets.ModelViewSet):
     queryset = Budget.objects.all()

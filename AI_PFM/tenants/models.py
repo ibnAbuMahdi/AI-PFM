@@ -22,18 +22,25 @@ class User(TenantBaseModel, AbstractUser):
     username = models.CharField(unique=True, max_length=255)
     password = models.CharField(max_length=255)
     
-    
-class Transaction(TenantBaseModel, models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
-    category = models.CharField(max_length=50)
-    date = models.DateField()
-    description = models.TextField()
-    # Other transaction-specific fields (e.g., description, merchant)
-    
 
 class Budget(TenantBaseModel, models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    category = models.CharField(max_length=50)
+    category = models.CharField(max_length=50, default="None")
+    title = models.CharField(max_length=50, default="Budget Title")
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     period = models.CharField(max_length=20, choices=[('monthly', 'Monthly'), ('yearly', 'Yearly')])
+    active = models.BooleanField(default=True)
+    
+    def __str__(self):
+        return self.title
+    
+class Transaction(TenantBaseModel, models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    budget = models.ForeignKey(Budget, on_delete=models.CASCADE, null=True)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    category = models.CharField(max_length=50, default="None", null=True)
+    title = models.CharField(max_length=50, default="Transaction Title")
+    date = models.DateField(auto_now=True)
+    description = models.TextField(null=True)
+    # Other transaction-specific fields (e.g., description, merchant)
+    
