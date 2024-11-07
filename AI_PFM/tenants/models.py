@@ -28,6 +28,7 @@ class Budget(TenantBaseModel, models.Model):
     category = models.CharField(max_length=50, default="None")
     title = models.CharField(max_length=50, default="Budget Title")
     amount = models.DecimalField(max_digits=10, decimal_places=2)
+    date = models.DateField(auto_now=True)
     period = models.CharField(max_length=20, choices=[('monthly', 'Monthly'), ('yearly', 'Yearly')])
     active = models.BooleanField(default=True)
     
@@ -36,7 +37,7 @@ class Budget(TenantBaseModel, models.Model):
     
 class Transaction(TenantBaseModel, models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    budget = models.ForeignKey(Budget, on_delete=models.CASCADE, null=True)
+    budget = models.ForeignKey(Budget, on_delete=models.CASCADE, null=True, related_name='transactions')
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     category = models.CharField(max_length=50, default="None", null=True)
     title = models.CharField(max_length=50, default="Transaction Title")

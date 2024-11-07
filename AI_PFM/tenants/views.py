@@ -50,10 +50,10 @@ class LogoutView(APIView):
         request.auth.delete()
         return Response({'message': 'Logged out successfully.'})
 
-class UserDashboardViewSet(viewsets.ModelViewSet):
+class UserDashboardViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = UserDashboardSerializer
     permission_classes = (permissions.IsAuthenticated,)
-
+    
     def get_queryset(self):
         return User.objects.filter(id=self.request.user.id)  
 
@@ -76,5 +76,11 @@ class BudgetViewSet(viewsets.ModelViewSet):
     serializer_class = BudgetSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request  # Pass the request to the serializer context
+        return context
+    
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+                    

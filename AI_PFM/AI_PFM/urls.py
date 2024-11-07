@@ -23,12 +23,11 @@ router = DefaultRouter()
 router.register(r'transactions', TransactionViewSet)
 router.register(r'budgets', BudgetViewSet)
 router.register(r'register', UserRegistrationViewSet)
-
+router.register(r'dashboard', UserDashboardViewSet, basename='user_dashboard')
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('login/', CustomObtainAuthToken.as_view()),  # Login endpoint
     path('logout/', LogoutView.as_view()),  # Logout endpoint
     path('', include('rest_framework.urls')),
-    path('dashboard/', UserDashboardViewSet.as_view({'get': 'retrieve'})),
     path('', include(router.urls)),
 ]
