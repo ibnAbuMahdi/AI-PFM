@@ -45,6 +45,8 @@ class BudgetSerializer(serializers.ModelSerializer):
             for field_name in existing - allowed:
                 self.fields.pop(field_name)
     
+   
+    
     def create(self, validated_data):
         # Access the user from the request context
         user = self.context['request'].user
@@ -53,27 +55,20 @@ class BudgetSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 class UserDashboardSerializer(serializers.ModelSerializer):
-    recent_transactions = serializers.SerializerMethodField()
-    budget_summary = serializers.SerializerMethodField()
     budget_transactions = serializers.SerializerMethodField()
     budgets = serializers.SerializerMethodField()
-
+    
     class Meta:
         model = User  # Or a custom model for dashboard data
-        fields = ('recent_transactions', 'budget_summary', 'budget_transactions', 'budgets')
-
-    def get_recent_transactions(self, obj):
-        # Logic to fetch recent transactions for the user
-        return TransactionSerializer(Transaction.objects.filter(user=obj).order_by('-date')[:5], many=True).data
-
-    def get_budget_summary(self, obj):
-        # Logic to calculate budget summary
-        return BudgetSerializer(Budget.objects.filter(user=obj), many=True).data
+        fields = ('budget_transactions', 'budgets')
     
     def get_budget_transactions(self, obj):
-        budget_with_totals = Budget.objects.filter(user=obj).annotate(total_amount=Sum('transactions__amount'))
-        return [{"total_amount": budget.total_amount, 'title': budget.title, 'amount': budget.amount} for budget in budget_with_totals]
+        # budget_with_totals = Budget.objects.filter(user=obj, active=True, id=self.context.get('budget_id')).annotate(total_amount=Sum('transactions__amount')).order_by('-date')
+        return TransactionSerializer(Transaction.objects.filter(user=obj, budget=self.context.get('budget_id')).order_by('date'), many=True).data
+               
     
     def get_budgets(self, obj):
-        fields = ['id', 'title']
-        return BudgetSerializer(Budget.objects.filter(user=obj), many=True, fields=fields).data
+        budget_with_totals = Budget.objects.filter(user=obj, active=True).annotate(total_amount=Sum('transactions__amount')).order_by('-date')
+        fields = ['id', 'title', 'total_amount', 'amount']
+        return [{'id': budget.id, 'title': budget.title, 'total_amount': budget.total_amount, 'amount': budget.amount}
+                for budget in budget_with_totals]

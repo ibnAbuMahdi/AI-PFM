@@ -57,6 +57,13 @@ class UserDashboardViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         return User.objects.filter(id=self.request.user.id)  
 
+    @action(detail=False, methods=['get'], url_path=r'budgets/(?P<id>\d+)')
+    def Budget_Transactions(self, request, id=None):
+        user = self.get_queryset()
+        serializer = self.get_serializer(user, many=True, context={'budget_id': id})
+        return Response(serializer.data) 
+    
+
 class TransactionViewSet(viewsets.ModelViewSet):
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
