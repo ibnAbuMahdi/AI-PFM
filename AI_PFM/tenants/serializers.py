@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import User, Transaction, Budget
-from django.db.models import Sum
+from django.db.models import Sum, Avg
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -18,6 +18,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         return user
     
 class TransactionSerializer(serializers.ModelSerializer):
+    budget_title = serializers.SerializerMethodField()
     class Meta:
         model = Transaction
         exclude = ['user']
@@ -29,6 +30,9 @@ class TransactionSerializer(serializers.ModelSerializer):
         validated_data['user'] = user
         return super().create(validated_data)
 
+    def get_budget_title(self, obj):
+        return obj.budget.title if obj.budget else None
+   
 class BudgetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Budget
@@ -44,8 +48,7 @@ class BudgetSerializer(serializers.ModelSerializer):
             existing = set(self.fields)
             for field_name in existing - allowed:
                 self.fields.pop(field_name)
-    
-   
+
     
     def create(self, validated_data):
         # Access the user from the request context
@@ -57,14 +60,19 @@ class BudgetSerializer(serializers.ModelSerializer):
 class UserDashboardSerializer(serializers.ModelSerializer):
     budget_transactions = serializers.SerializerMethodField()
     budgets = serializers.SerializerMethodField()
+    averages = serializers.SerializerMethodField()
     
     class Meta:
         model = User  # Or a custom model for dashboard data
-        fields = ('budget_transactions', 'budgets')
+        fields = ('budget_transactions', 'budgets', 'averages')
     
     def get_budget_transactions(self, obj):
         # budget_with_totals = Budget.objects.filter(user=obj, active=True, id=self.context.get('budget_id')).annotate(total_amount=Sum('transactions__amount')).order_by('-date')
-        return TransactionSerializer(Transaction.objects.filter(user=obj, budget=self.context.get('budget_id')).order_by('date'), many=True).data
+        if 'budget_id' in self.context:
+            return TransactionSerializer(Transaction.objects.filter(user=obj, budget=self.context.get('budget_id')).order_by('date'), many=True).data
+        else:
+            budget = Budget.objects.filter(user=obj, active=True).order_by('-date').first()
+            return TransactionSerializer(Transaction.objects.filter(user=obj, budget=budget.id).order_by('date'), many=True).data
                
     
     def get_budgets(self, obj):
@@ -72,3 +80,24 @@ class UserDashboardSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'total_amount', 'amount']
         return [{'id': budget.id, 'title': budget.title, 'total_amount': budget.total_amount, 'amount': budget.amount}
                 for budget in budget_with_totals]
+    
+    def get_averages(self, obj):
+        if 'budget_id' in self.context:
+            recent_average = Transaction.objects.filter(user=obj, budget=self.context.get('budget_id')).order_by('date').aggregate(Avg('amount'))
+            count = Transaction.objects.filter(user=obj, budget=self.context.get('budget_id')).count()
+            last_average = 0
+            if count > 1:
+                last_average = Transaction.objects.filter(user=obj, budget=self.context.get('budget_id')).order_by('-date')[1:].aggregate(Avg('amount'))       
+            diff = round((recent_average['amount__avg']-last_average['amount__avg']) / recent_average['amount__avg'], 2)
+            return {'recent_average': recent_average, 'diff': diff}
+        else:
+            budget = Budget.objects.filter(user=obj, active=True).order_by('-date').first()
+            count = Transaction.objects.filter(user=obj, budget=self.context.get('budget_id')).count()
+            recent_average = Transaction.objects.filter(user=obj, budget=budget.id).order_by('date').aggregate(Avg('amount'))
+            last_average = 0
+            if count > 1:
+                last_average = Transaction.objects.filter(user=obj, budget=budget.id).order_by('-date')[1:].aggregate(Avg('amount'))
+            diff = round((recent_average['amount__avg']-last_average['amount__avg']) / recent_average['amount__avg'], 2)
+            return {'recent_average': recent_average, 'diff': diff}
+
+               

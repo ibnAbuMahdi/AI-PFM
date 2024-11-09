@@ -2,6 +2,7 @@ from rest_framework import viewsets, permissions, status
 from .serializers import UserDashboardSerializer
 from .serializers import UserRegistrationSerializer, TransactionSerializer, BudgetSerializer
 from .models import User, Transaction, Budget
+from django.db.models import Sum
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token    
 from rest_framework.response import Response
@@ -65,7 +66,7 @@ class UserDashboardViewSet(viewsets.ReadOnlyModelViewSet):
     
 
 class TransactionViewSet(viewsets.ModelViewSet):
-    queryset = Transaction.objects.all()
+    queryset = Transaction.objects.all().order_by('-date')
     serializer_class = TransactionSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
@@ -79,7 +80,7 @@ class TransactionViewSet(viewsets.ModelViewSet):
                     
 
 class BudgetViewSet(viewsets.ModelViewSet):
-    queryset = Budget.objects.all()
+    queryset = Budget.objects.all().order_by('-date')
     serializer_class = BudgetSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
@@ -90,4 +91,11 @@ class BudgetViewSet(viewsets.ModelViewSet):
     
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-                    
+
+    @action(detail=False, methods=['get'], url_path=r'history')
+    def Budgets_history(self, request):
+        budget_with_totals = Budget.objects.filter(user=request.user, active=True).annotate(total_amount=Sum('transactions__amount')).order_by('date')
+        fields = ['id', 'title', 'total_amount', 'amount']
+        return Response([{'id': budget.id, 'title': budget.title, 'total_amount': budget.total_amount, 'amount': budget.amount}
+                for budget in budget_with_totals]) 
+    

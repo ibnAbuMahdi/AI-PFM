@@ -28,7 +28,7 @@ class Budget(TenantBaseModel, models.Model):
     category = models.CharField(max_length=50, default="None")
     title = models.CharField(max_length=50, default="Budget Title")
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    date = models.DateField(auto_now=True)
+    date = models.DateTimeField(auto_now_add=True)
     period = models.CharField(max_length=20, choices=[('monthly', 'Monthly'), ('yearly', 'Yearly')])
     active = models.BooleanField(default=True)
     
@@ -41,7 +41,7 @@ class Transaction(TenantBaseModel, models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     category = models.CharField(max_length=50, default="None", null=True)
     title = models.CharField(max_length=50, default="Transaction Title")
-    date = models.DateField(auto_now=True)
+    date = models.DateTimeField(auto_now_add=True)
     description = models.TextField(null=True)
     # Other transaction-specific fields (e.g., description, merchant)
     
