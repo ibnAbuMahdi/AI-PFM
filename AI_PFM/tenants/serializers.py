@@ -85,19 +85,28 @@ class UserDashboardSerializer(serializers.ModelSerializer):
         if 'budget_id' in self.context:
             recent_average = Transaction.objects.filter(user=obj, budget=self.context.get('budget_id')).order_by('date').aggregate(Avg('amount'))
             count = Transaction.objects.filter(user=obj, budget=self.context.get('budget_id')).count()
-            last_average = 0
+            last_average = {'amount__avg': 0}
             if count > 1:
                 last_average = Transaction.objects.filter(user=obj, budget=self.context.get('budget_id')).order_by('-date')[1:].aggregate(Avg('amount'))       
-            diff = round((recent_average['amount__avg']-last_average['amount__avg']) / recent_average['amount__avg'], 2)
+            if recent_average['amount__avg']:
+                diff = round((recent_average['amount__avg']-last_average['amount__avg']) / recent_average['amount__avg'], 2)
+            else:
+                diff = 0
+            
             return {'recent_average': recent_average, 'diff': diff}
         else:
             budget = Budget.objects.filter(user=obj, active=True).order_by('-date').first()
-            count = Transaction.objects.filter(user=obj, budget=self.context.get('budget_id')).count()
+            count = Transaction.objects.filter(user=obj, budget=budget.id).count()
             recent_average = Transaction.objects.filter(user=obj, budget=budget.id).order_by('date').aggregate(Avg('amount'))
-            last_average = 0
+            last_average = {'amount__avg': 0}
+            
             if count > 1:
                 last_average = Transaction.objects.filter(user=obj, budget=budget.id).order_by('-date')[1:].aggregate(Avg('amount'))
-            diff = round((recent_average['amount__avg']-last_average['amount__avg']) / recent_average['amount__avg'], 2)
+            
+            if recent_average['amount__avg']:
+                diff = round((recent_average['amount__avg']-last_average['amount__avg']) / recent_average['amount__avg'], 2)
+            else:
+                diff = 0
             return {'recent_average': recent_average, 'diff': diff}
 
                

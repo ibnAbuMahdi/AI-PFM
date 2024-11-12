@@ -113,7 +113,7 @@ LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
-
+USE_L10N = True
 USE_TZ = True
 
 
@@ -130,7 +130,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'tenants.auth.CustomTokenAuthentication',
-    ]
+    ],
+    'DATETIME_FORMAT': "%d %b %Y %I:%M%p",
 }
 
 AUTH_USER_MODEL = 'tenants.User'
+
+# DATETIME_FORMAT = 'Y-m-d H:i:sO'

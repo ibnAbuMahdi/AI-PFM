@@ -25,7 +25,7 @@ class User(TenantBaseModel, AbstractUser):
 
 class Budget(TenantBaseModel, models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    category = models.CharField(max_length=50, default="None")
+    category = models.CharField(max_length=50, default="None", null=True)
     title = models.CharField(max_length=50, default="Budget Title")
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     date = models.DateTimeField(auto_now_add=True)
@@ -41,7 +41,7 @@ class Transaction(TenantBaseModel, models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     category = models.CharField(max_length=50, default="None", null=True)
     title = models.CharField(max_length=50, default="Transaction Title")
-    date = models.DateTimeField(auto_now_add=True)
+    date = models.DateTimeField()
     description = models.TextField(null=True)
     # Other transaction-specific fields (e.g., description, merchant)
     

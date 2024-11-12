@@ -61,7 +61,9 @@ class UserDashboardViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=False, methods=['get'], url_path=r'budgets/(?P<id>\d+)')
     def Budget_Transactions(self, request, id=None):
         user = self.get_queryset()
-        serializer = self.get_serializer(user, many=True, context={'budget_id': id})
+        context = super().get_serializer_context()
+        context['budget_id'] = id
+        serializer = self.get_serializer(user, many=True, context=context)
         return Response(serializer.data) 
     
 
@@ -93,9 +95,16 @@ class BudgetViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
     @action(detail=False, methods=['get'], url_path=r'history')
-    def Budgets_history(self, request):
+    def budgets_history(self, request):
         budget_with_totals = Budget.objects.filter(user=request.user, active=True).annotate(total_amount=Sum('transactions__amount')).order_by('date')
-        fields = ['id', 'title', 'total_amount', 'amount']
-        return Response([{'id': budget.id, 'title': budget.title, 'total_amount': budget.total_amount, 'amount': budget.amount}
+        fields = ['id', 'title', 'total_amount', 'amount', 'category', 'date', 'period']
+        return Response([{'id': budget.id, 'title': budget.title, 'total_amount': budget.total_amount, 'amount': budget.amount, 'category': budget.category, 'date': budget.date, 'period': budget.period}
                 for budget in budget_with_totals]) 
     
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        data = {
+            'budget': self.get_serializer(instance).data,
+            'transactions': TransactionSerializer(instance.transactions.all(), many=True).data
+        }
+        return Response(data)
