@@ -116,8 +116,8 @@ class BudgetViewSet(viewsets.ModelViewSet):
             # If 'prefetch_related' has been applied to a queryset, we need to
             # forcibly invalidate the prefetch cache on the instance.
             instance._prefetched_objects_cache = {}
-
         return Response(serializer.data)
+    
     def retrieve(self, request, *args, **kwargs):
         if 'active' in request.query_params:
             instance = Budget.objects.filter(user=request.user.id, id=kwargs['pk']).first()
