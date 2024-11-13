@@ -20,8 +20,8 @@ from tenants.views import CustomObtainAuthToken, UserRegistrationViewSet, Logout
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
-router.register(r'transactions', TransactionViewSet)
-router.register(r'budgets', BudgetViewSet)
+router.register(r'transactions', TransactionViewSet, basename='transactions')
+router.register(r'budgets', BudgetViewSet, basename='budgets')
 router.register(r'register', UserRegistrationViewSet)
 router.register(r'dashboard', UserDashboardViewSet, basename='user_dashboard')
 urlpatterns = [
