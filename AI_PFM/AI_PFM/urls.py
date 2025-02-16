@@ -16,6 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+# from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework.authtoken.views import ObtainAuthToken
+from daas.views import *
 from tenants.views import CustomObtainAuthToken, UserRegistrationViewSet, LogoutView, UserDashboardViewSet, TransactionViewSet, BudgetViewSet
 from rest_framework.routers import DefaultRouter
 
@@ -24,8 +27,12 @@ router.register(r'transactions', TransactionViewSet, basename='transactions')
 router.register(r'budgets', BudgetViewSet, basename='budgets')
 router.register(r'register', UserRegistrationViewSet)
 router.register(r'dashboard', UserDashboardViewSet, basename='user_dashboard')
+router.register(r'user', UserViewSet, basename='daas_users')
+router.register(r'prospects', ProspectViewSet, basename='daas_prospects')
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('daas/login/', DAASObtainAuthToken.as_view()),
     path('login/', CustomObtainAuthToken.as_view()),  # Login endpoint
     path('logout/', LogoutView.as_view()),  # Logout endpoint
     path('', include('rest_framework.urls')),

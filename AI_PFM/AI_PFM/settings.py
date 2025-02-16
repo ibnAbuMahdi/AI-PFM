@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'tenants',
     'rest_framework',
+    'daas',
 ]
 
 MIDDLEWARE = [
@@ -130,10 +131,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'tenants.auth.CustomTokenAuthentication',
+        # '.TokenObtainPairView'
     ],
     'DATETIME_FORMAT': "%d %b %Y %I:%M%p",
 }
-
+ALLOWED_METHODS =  ['GET', 'POST', 'DELETE', 'PUT', 'PATCH', 'OPTIONS', 'HEAD']
 AUTH_USER_MODEL = 'tenants.User'
 
 # DATETIME_FORMAT = 'Y-m-d H:i:sO'

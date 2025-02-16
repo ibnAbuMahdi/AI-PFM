@@ -10,7 +10,7 @@ class Tenant(models.Model):
         return self.name
 
 class TenantBaseModel(models.Model):
-    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE)
+    tenant = models.ForeignKey(Tenant, on_delete=models.CASCADE, null=True)
     
     class Meta:
         abstract = True
