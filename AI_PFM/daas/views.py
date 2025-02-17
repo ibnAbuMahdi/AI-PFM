@@ -46,5 +46,5 @@ class DAASObtainAuthToken(ObtainAuthToken):
         response = super().post(request, *args, **kwargs)
         token = Token.objects.get(key=response.data['token'])
         user = token.user
-        response.data['username'], response.data['email'] = user.username, user.email  
+        response.data['id'], response.data['username'], response.data['email'] = user.id, user.username, user.email  
         return response
