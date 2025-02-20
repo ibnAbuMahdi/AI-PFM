@@ -16,7 +16,7 @@ class Prospect(models.Model):
     message = models.TextField(null=True)
     phone = models.CharField(null=True, max_length=15)
     school = models.TextField(null=True)
-    termfees = models.IntegerField(null=True)
+    package = models.TextField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     stage = models.CharField(max_length=20, default='cont', choices=[('cont', 'Contact'), ('disc', 'Discussion'), ('app', 'Appointment'), ('dec', 'Decision'), ('agr', 'Agreement')])
     status = models.BooleanField(default=True)
