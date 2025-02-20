@@ -29,7 +29,7 @@ router.register(r'register', UserRegistrationViewSet)
 router.register(r'dashboard', UserDashboardViewSet, basename='user_dashboard')
 router.register(r'user', UserViewSet, basename='daas_users')
 router.register(r'prospects', ProspectViewSet, basename='daas_prospects')
-
+ 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('daas/login/', DAASObtainAuthToken.as_view()),
