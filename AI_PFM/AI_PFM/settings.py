@@ -88,7 +88,7 @@ DATABASES = {
     }
 }
 
-# CORS_ALLOWED_ORIGINS = ['*']
+CORS_ALLOWED_ORIGINS = []
 
 CORS_ALLOW_METHODS = [
     'DELETE',
@@ -99,11 +99,6 @@ CORS_ALLOW_METHODS = [
     'PUT',
 ]
 
-# CORS_ALLOW_HEADERS = [
-#     'content-type',
-#     'authorization',
-#     'x-csrftoken',
-# ]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = True
 # Password validation
