@@ -33,9 +33,8 @@ class UserViewSet(viewsets.ModelViewSet):
 class ProspectViewSet(viewsets.ModelViewSet):
     queryset = Prospect.objects.all()
     serializer_class = ProspectSerializer
-    permission_classes = (permissions.IsAuthenticated,)
     
-    @action(detail=False, methods=["GET"], url_path=r'agent/(?P<id>\d+)')
+    @action(detail=False, methods=["GET"], url_path=r'agent/(?P<id>\d+)', permission_classes=[permissions.IsAuthenticated])
     def agent_list(self, request, id):
         prospects = self.queryset.filter(agent=id)
         return response.Response(self.serializer_class(prospects, many=True).data)
