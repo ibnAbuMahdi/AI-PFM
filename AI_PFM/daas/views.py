@@ -46,14 +46,14 @@ class ProspectViewSet(viewsets.ModelViewSet):
         # Custom logic before creation
         jsondata = list(request.data.keys())[0]
         data = json.loads(jsondata)
-        # data.package = data.get('package')[0] if len(data.get('package')) else None
-        # serializer = self.get_serializer(data=data)
-        # serializer.is_valid(raise_exception=True)
-        # self.perform_create(serializer)
-        # # Custom logic after creation
-        # headers = self.get_success_headers(serializer.data)
-        # return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-        return Response(data)
+        data['package'] = data.get('package')[0] if len(data.get('package')) else None
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        # Custom logic after creation
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        # return Response(data)
     
 class DAASObtainAuthToken(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
