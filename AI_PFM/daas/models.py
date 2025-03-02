@@ -12,7 +12,7 @@ class Prospect(models.Model):
     agent = models.ForeignKey(DAASUser, null=True, on_delete=models.SET_NULL)
     email = models.EmailField(unique=True)
     name = models.TextField(null=True)
-    address = models.TextField(null=True)
+    address = models.TextField(blank=True, null=True)
     message = models.TextField(blank=True, null=True)
     phone = models.CharField(null=True, max_length=15)
     school = models.TextField(null=True)
