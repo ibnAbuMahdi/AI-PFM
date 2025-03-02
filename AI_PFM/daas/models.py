@@ -13,7 +13,7 @@ class Prospect(models.Model):
     email = models.EmailField(unique=True)
     name = models.TextField(null=True)
     address = models.TextField(null=True)
-    message = models.TextField(null=True)
+    message = models.TextField(blank=True, null=True)
     phone = models.CharField(null=True, max_length=15)
     school = models.TextField(null=True)
     package = models.TextField(null=True)
