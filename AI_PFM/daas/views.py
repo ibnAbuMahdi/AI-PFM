@@ -44,7 +44,7 @@ class ProspectViewSet(viewsets.ModelViewSet):
     
     def create(self, request, *args, **kwargs):
         # Custom logic before creation
-        jsondata = request.data.keys()[0]
+        jsondata = list(request.data.keys())[0]
         data = json.loads(jsondata)
         data.package = data.get('package')[0] if len(data.get('package')) else None
         serializer = self.get_serializer(data=data)
