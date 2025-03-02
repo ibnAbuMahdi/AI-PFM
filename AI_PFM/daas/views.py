@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token    
+import json
 
 # Create your views here.
 
@@ -43,13 +44,15 @@ class ProspectViewSet(viewsets.ModelViewSet):
     
     def create(self, request, *args, **kwargs):
         # Custom logic before creation
-        # serializer = self.get_serializer(data=request.data)
-        # serializer.is_valid(raise_exception=True)
-        # self.perform_create(serializer)
-        # # Custom logic after creation
-        # headers = self.get_success_headers(serializer.data)
-        # return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-        return Response(request.data)
+        jsondata = request.data.keys()[0]
+        data = json.loads(jsondata)
+        data.package = data.get('package')[0] if len(data.get('package')) else None
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        # Custom logic after creation
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
     
 class DAASObtainAuthToken(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
